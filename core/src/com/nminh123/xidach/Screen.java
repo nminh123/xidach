@@ -250,13 +250,15 @@ public class Screen implements com.badlogic.gdx.Screen
 
     void hitCard()
     {
-        Card card = deck.remove(deck.size() - 1);
-        playerSum += card.getValue();
-        playerAceCount += card.isAce() ? 1 : 0;
+        if(countPlayerCards < 6)
+        {
+            Card card = deck.remove(deck.size() - 1);
+            playerSum += card.getValue();
+            playerAceCount += card.isAce() ? 1 : 0;
 
-        countPlayerCards += 1;
-        System.out.println(countPlayerCards);
-        playerHand.add(card);
+            countPlayerCards += 1;
+            playerHand.add(card);
+        }
     }
 
     void drawPlayerHitCard()
@@ -303,7 +305,6 @@ public class Screen implements com.badlogic.gdx.Screen
             {
                 return true; // Nếu có quân Át, trả về ngay
             }
-            System.out.println(h);
         }
         return false; // Không có quân Át
     }
@@ -420,13 +421,14 @@ public class Screen implements com.badlogic.gdx.Screen
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, int button)
             {
-                if(isStayBtnClicked)
-                {
-                    stayBtn.setDrawable(new Image(buttonImage).getDrawable());
-                    dealerSum = reduceDealerAce();
+                stayBtn.setDrawable(new Image(buttonImage).getDrawable());
+                dealerSum = reduceDealerAce();
 
-                    while (dealerSum <= 17) {
-                        if(checkAce(dealerHand))
+                while (dealerSum <= 17)
+                {
+                    if(checkAce(dealerHand))
+                    {
+                        if(countDealerCards < 6)
                         {
                             Card card = deck.remove(deck.size()-1);
                             dealerSum += card.getValue();
@@ -435,9 +437,9 @@ public class Screen implements com.badlogic.gdx.Screen
                             drawDealerHitCard();
                         }
                     }
-                    revealHiddenCard();
-                    WhoWins();
                 }
+                revealHiddenCard();
+                WhoWins();
             }
         });
 
