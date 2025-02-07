@@ -314,32 +314,15 @@ public class Screen implements com.badlogic.gdx.Screen
     {
         String message = "";
 
-        if (playerSum > 21)
-        {
+        if (playerSum > 21) {
             message = (dealerSum > 21) ? "Tie!" : "You Lose!";
-        }
-        else if (playerSum < 16)
-        {
-            message = "You Lose!";
-        }
-        else if (dealerSum > 21 || dealerSum < 15)
-        {
+        } else if (dealerSum > 21 || dealerSum < 15 || (countPlayerCards == 2 && checkAce(playerHand))) {
             message = "You Win!";
-        }
-        else if (playerSum == dealerSum)
-        {
+        } else if (playerSum < 16 || (countDealerCards == 2 && checkAce(dealerHand))) {
+            message = "You Lose!";
+        } else if (playerSum == dealerSum) {
             message = "Tie!";
-        }
-        else if(countPlayerCards == 2 && checkAce(playerHand))
-        {
-            message = "You Win!";
-        }
-        else if(countDealerCards == 2 && checkAce(dealerHand))
-        {
-            message = "You Lose!";
-        }
-        else
-        {
+        } else {
             message = (playerSum > dealerSum) ? "You Win!" : "You Lose!";
         }
 
