@@ -10,6 +10,8 @@ public class Card
         this.type = type;
     }
 
+    public Card(){}
+
     public String getType(){return type;}
 
     public int getValue() {

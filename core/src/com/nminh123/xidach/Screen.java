@@ -2,6 +2,7 @@ package com.nminh123.xidach;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Color;
@@ -9,12 +10,12 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
-import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 
 import java.util.ArrayList;
@@ -33,29 +34,34 @@ public class Screen implements com.badlogic.gdx.Screen
     Image hitBtn, stayBtn, replayBtn;
     Texture buttonImage, pressedButtonImage;
 
+    float dist = 120;
+
     ///Initialize core game attribute
     ArrayList<Card> deck;
     Random random = new Random(); //shuffle deck
 
     //dealer
-    Card hiddenCard;
     ArrayList<Card> dealerHand;
     int dealerSum;
     int dealerAceCount;
+    //Hidden card
+    Card hiddenCard;
     Texture hiddenCardTexture;
     Image hiddenCardImage;
+    int countDealerCards = 0;
 
     //player
     ArrayList<Card> playerHand;
     int playerSum;
     int playerAceCount;
+    int countPlayerCards = 0;
 
     boolean isStayBtnClicked = false;
 
     public Screen()
     {
-        cam = new OrthographicCamera();
-        viewport = new ExtendViewport(Consts.cardWidth,Consts.boardHeight, cam);
+        cam = new OrthographicCamera(Consts.boardWith, Consts.boardHeight);
+        viewport = new ScreenViewport(cam);
         stage = new Stage(viewport);
         buttonImage = new Texture(Gdx.files.internal("button-over.png"));
         pressedButtonImage = new Texture(Gdx.files.internal("button-pressed-over.png"));
@@ -89,7 +95,7 @@ public class Screen implements com.badlogic.gdx.Screen
     {
         backgroundImage = new TextureRegion(new Texture(Gdx.files.internal("bj_table_color.jpg")));
         background = new Image(backgroundImage);
-        background.setSize(900,600);
+        background.setSize(900,620);
         stage.addActor(background);
     }
 
@@ -163,15 +169,17 @@ public class Screen implements com.badlogic.gdx.Screen
         dealerAceCount += card.isAce() ? 1 : 0;
         dealerHand.add(card);
 
+        countDealerCards = 2;
         drawDealerCard();
 
         System.out.println("DEALER HIDDEN CARD: " + hiddenCard + "\t \t DEALDER HAND: " + dealerHand + "\t \t DEALER SUM: " + dealerSum + "\t \t DEALER ACE COUNT: " + dealerAceCount);
     }
 
-    void drawDealerCard() {
+    void drawDealerCard()
+    {
         hiddenCardImage = new Image(hiddenCardTexture);
         hiddenCardImage.setSize(Consts.cardWidth, Consts.cardHeight);
-        hiddenCardImage.setPosition(300, 420);
+        hiddenCardImage.setPosition(Consts.dealerCardPosition.x, Consts.dealerCardPosition.y);
 
         stage.addActor(hiddenCardImage);
 
@@ -183,8 +191,7 @@ public class Screen implements com.badlogic.gdx.Screen
             image.setSize(Consts.cardWidth, Consts.cardHeight);
 
             // Set card position (adjust X to avoid overlap)
-            image.setPosition(180, 420);
-            image.debug();
+            image.setPosition(Consts.dealerCardPosition.x + dist, Consts.dealerCardPosition.y);
 
             stage.addActor(image);
         }
@@ -205,6 +212,7 @@ public class Screen implements com.badlogic.gdx.Screen
             playerHand.add(card);
         }
 
+        countPlayerCards = 2;
         drawPlayerCard();
 
         System.out.println("PLAYER HAND: " + playerHand + "\t \t PLAYER SUM: " + playerSum + "\t \t PLAYER ACE COUNT: " + playerAceCount);
@@ -213,6 +221,7 @@ public class Screen implements com.badlogic.gdx.Screen
     void drawPlayerCard()
     {
         Image[] images = new Image[2];
+        
 
         for (int i = 0; i < playerHand.size() - 1; i++)
         {
@@ -221,7 +230,7 @@ public class Screen implements com.badlogic.gdx.Screen
 
             images[0] = new Image(cardTexture);
             images[0].setSize(Consts.cardWidth, Consts.cardHeight);
-            images[0].setPosition(180, 130);
+            images[0].setPosition(Consts.playerCardPosition.x, Consts.playerCardPosition.y);
 
             stage.addActor(images[0]);
         }
@@ -233,7 +242,7 @@ public class Screen implements com.badlogic.gdx.Screen
 
             images[1] = new Image(cardTexture);
             images[1].setSize(Consts.cardWidth, Consts.cardHeight);
-            images[1].setPosition(300, 130);
+            images[1].setPosition(Consts.playerCardPosition.x + dist, 130);
 
             stage.addActor(images[1]);
         }
@@ -245,6 +254,8 @@ public class Screen implements com.badlogic.gdx.Screen
         playerSum += card.getValue();
         playerAceCount += card.isAce() ? 1 : 0;
 
+        countPlayerCards += 1;
+        System.out.println(countPlayerCards);
         playerHand.add(card);
     }
 
@@ -256,7 +267,7 @@ public class Screen implements com.badlogic.gdx.Screen
             Texture cardTexture = new Texture(Gdx.files.internal(card.getImagePath()));
             Image image = new Image(cardTexture);
             image.setSize(Consts.cardWidth, Consts.cardHeight);
-            image.setPosition(300 + 120,130);
+            image.setPosition(Consts.playerCardPosition.x + dist * i,130);
 
             stage.addActor(image);
         }
@@ -264,16 +275,78 @@ public class Screen implements com.badlogic.gdx.Screen
 
     void drawDealerHitCard()
     {
+
         for(int i = dealerHand.size() - 1; i >= dealerHand.size() - 1; i--)
         {
             Card card = dealerHand.get(i);
             Texture cardTexture = new Texture(Gdx.files.internal(card.getImagePath()));
             Image image = new Image(cardTexture);
             image.setSize(Consts.cardWidth, Consts.cardHeight);
-            image.setPosition(300 + 120,420);
+            image.setPosition(Consts.dealerCardPosition.x + dist * 2, Consts.dealerCardPosition.y);
 
+            countDealerCards += 1;
             stage.addActor(image);
         }
+    }
+
+    void revealHiddenCard()
+    {
+        Texture hiddenCardTexture = new Texture(hiddenCard.getImagePath());
+        hiddenCardImage.setDrawable(new Image(hiddenCardTexture).getDrawable());
+    }
+
+    boolean checkAce(ArrayList<Card> hand)
+    {
+        for (Card h : hand)
+        {
+            if (h.isAce())
+            {
+                return true; // Nếu có quân Át, trả về ngay
+            }
+            System.out.println(h);
+        }
+        return false; // Không có quân Át
+    }
+
+
+    void WhoWins()
+    {
+        String message = "";
+
+        if (playerSum > 21)
+        {
+            message = (dealerSum > 21) ? "Tie!" : "You Lose!";
+        }
+        else if (playerSum < 16)
+        {
+            message = "You Lose!";
+        }
+        else if (dealerSum > 21 || dealerSum < 15)
+        {
+            message = "You Win!";
+        }
+        else if (playerSum == dealerSum)
+        {
+            message = "Tie!";
+        }
+        else if(countPlayerCards == 2 && checkAce(playerHand))
+        {
+            message = "You Win!";
+        }
+        else if(countDealerCards == 2 && checkAce(dealerHand))
+        {
+            message = "You Lose!";
+        }
+        else
+        {
+            message = (playerSum > dealerSum) ? "You Win!" : "You Lose!";
+        }
+
+
+        Label label = new Label(message, new Label.LabelStyle(new BitmapFont(), Color.WHITE));
+        label.setPosition(310, 280, Align.center);
+        label.setSize(140, 160);
+        stage.addActor(label);
     }
 
     void setUpHitBtn()
@@ -348,14 +421,22 @@ public class Screen implements com.badlogic.gdx.Screen
             public void touchUp(InputEvent event, float x, float y, int pointer, int button)
             {
                 if(isStayBtnClicked)
+                {
                     stayBtn.setDrawable(new Image(buttonImage).getDrawable());
+                    dealerSum = reduceDealerAce();
 
-                while (dealerSum < 17) {
-                    Card card = deck.remove(deck.size()-1);
-                    dealerSum += card.getValue();
-                    dealerAceCount += card.isAce() ? 1 : 0;
-                    dealerHand.add(card);
-                    drawDealerHitCard();
+                    while (dealerSum <= 17) {
+                        if(checkAce(dealerHand))
+                        {
+                            Card card = deck.remove(deck.size()-1);
+                            dealerSum += card.getValue();
+                            dealerAceCount += card.isAce() ? 1 : 0;
+                            dealerHand.add(card);
+                            drawDealerHitCard();
+                        }
+                    }
+                    revealHiddenCard();
+                    WhoWins();
                 }
             }
         });
@@ -418,5 +499,11 @@ public class Screen implements com.badlogic.gdx.Screen
         stage.dispose();
         buttonImage.dispose();
         pressedButtonImage.dispose();
+        hiddenCardTexture.dispose();
+        hiddenCardImage.clear();
+        background.clear();
+        hitBtn.clear();
+        stayBtn.clear();
+        replayBtn.clear();
     }
 }
