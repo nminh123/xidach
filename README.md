@@ -1,6 +1,6 @@
 # xidach
 
-- xidach is Black Jack game created by using Libgdx. Download on release.
+- xidach is Black Jack game created by using Libgdx. Download in release.
 
 ** If you use Window or Linux, use this command.
 
