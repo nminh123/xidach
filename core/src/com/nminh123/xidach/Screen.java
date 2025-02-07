@@ -414,6 +414,7 @@ public class Screen implements com.badlogic.gdx.Screen
         {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                stayBtn.setDrawable(new Image(buttonImage).getDrawable());
                 isStayBtnClicked = true; // nhớ set lại trạng thái khi hoàn thành màn chơi.
                 return true;
             }
@@ -421,21 +422,19 @@ public class Screen implements com.badlogic.gdx.Screen
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, int button)
             {
-                stayBtn.setDrawable(new Image(buttonImage).getDrawable());
                 dealerSum = reduceDealerAce();
 
-                while (dealerSum <= 17)
+                while (dealerSum <= 17 && countDealerCards < 6)
                 {
                     if(checkAce(dealerHand))
                     {
-                        if(countDealerCards < 6)
-                        {
-                            Card card = deck.remove(deck.size()-1);
-                            dealerSum += card.getValue();
-                            dealerAceCount += card.isAce() ? 1 : 0;
-                            dealerHand.add(card);
-                            drawDealerHitCard();
-                        }
+                        stayBtn.setDrawable(new Image(buttonImage).getDrawable());
+
+                        Card card = deck.remove(deck.size()-1);
+                        dealerSum += card.getValue();
+                        dealerAceCount += card.isAce() ? 1 : 0;
+                        dealerHand.add(card);
+                        drawDealerHitCard();
                     }
                 }
                 revealHiddenCard();
